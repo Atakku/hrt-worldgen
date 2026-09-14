@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:flat_cache",
+  "argument": {
+    "type": "hrt_worldgen:lerp",
+    "delta": {
+      "type": "hrt_worldgen:edge_ratio",
+      "end": 14336.0,
+      "size": 2048.0
+    },
+    "start": {
+      "type": "minecraft:clamp",
+      "min": -1.0,
+      "max": 1.0,
+      "input": {
+        "type": "minecraft:mul",
+        "argument1": 5,
+        "argument2": {
+          "type": "minecraft:add",
+          "argument1": -0.55,
+          "argument2": {
+            "type": "minecraft:abs",
+            "argument": {
+              "type": "minecraft:add",
+              "argument1": -0.075,
+              "argument2": "tectonic:__constants/noise/temperature"
+            }
+          }
+        }
+      }
+    },
+    "end": 0
+  }
+}

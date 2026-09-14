@@ -21,10 +21,10 @@
           },
           "argument2": {
             "type": "minecraft:mul",
-            "argument1": 1024,
+            "argument1": 2048,
             "argument2": {
               "type": "minecraft:noise",
-              "noise": "hrt_worldgen:fuzz",
+              "noise": "hrt_worldgen:blend",
               "xz_scale": 1.0,
               "y_scale": 1.0
             }
@@ -37,7 +37,7 @@
       "argument1": 0.15,
       "argument2": {
         "type": "minecraft:noise",
-        "noise": "hrt_worldgen:fuzz",
+        "noise": "hrt_worldgen:blend",
         "xz_scale": 1.0,
         "y_scale": 1.0
       }
