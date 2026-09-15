@@ -2,11 +2,7 @@
   "type": "minecraft:flat_cache",
   "argument": {
     "type": "hrt_worldgen:lerp",
-    "delta": {
-      "type": "hrt_worldgen:edge_ratio",
-      "end": 14336.0,
-      "size": 2048.0
-    },
+    "delta": "hrt_worldgen:__constants/continent_edge",
     "start": {
       "type": "minecraft:clamp",
       "min": -1.0,
@@ -22,7 +18,7 @@
             "argument": {
               "type": "minecraft:add",
               "argument1": -0.075,
-              "argument2": "tectonic:__constants/noise/temperature"
+              "argument2": "hrt_worldgen:__constants/temperature"
             }
           }
         }

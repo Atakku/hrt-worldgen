@@ -2,36 +2,8 @@
   "type": "minecraft:flat_cache",
   "argument": {
     "type": "hrt_worldgen:lerp",
-    "delta": {
-      "type": "hrt_worldgen:edge_ratio",
-      "end": 14336.0,
-      "size": 2048.0
-    },
-    "start": {
-      "type": "minecraft:clamp",
-      "min": -1.0,
-      "max": 1.0,
-      "input": {
-        "type": "minecraft:mul",
-        "argument1": 0.000065,
-        "argument2": {
-          "type": "minecraft:add",
-          "argument1": {
-            "type": "hrt_worldgen:x_add_z"
-          },
-          "argument2": {
-            "type": "minecraft:mul",
-            "argument1": 2048,
-            "argument2": {
-              "type": "minecraft:noise",
-              "noise": "hrt_worldgen:blend",
-              "xz_scale": 1.0,
-              "y_scale": 1.0
-            }
-          }
-        }
-      }
-    },
+    "delta": "hrt_worldgen:__constants/world_edge",
+    "start": "hrt_worldgen:__constants/temperature",
     "end": {
       "type": "minecraft:mul",
       "argument1": 0.15,

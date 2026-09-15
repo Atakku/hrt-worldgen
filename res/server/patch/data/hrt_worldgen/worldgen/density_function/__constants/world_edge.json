@@ -1,0 +1,5 @@
+{
+  "type": "hrt_worldgen:edge_ratio",
+  "end": 14336.0,
+  "size": 2048.0
+}
