@@ -9,7 +9,11 @@
     "type": "minecraft:add",
     "argument1": {
       "type": "hrt_worldgen:lerp",
-      "delta": "hrt_worldgen:__constants/continent_edge",
+      "delta": {
+        "type": "hrt_worldgen:edge_ratio",
+        "end": 12288.0,
+        "size": 4096.0
+      },
       "start": {
         "type": "hrt_worldgen:lerp",
         "delta": {

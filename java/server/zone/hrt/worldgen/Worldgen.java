@@ -33,8 +33,14 @@ public class Worldgen {
   public static final String MOD_ID = "hrt_worldgen";
   public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-  public static final int BORDER = 14 * 64;
-  public static final int BORDER_SOFT = 14 * 64 - 4;
+  // Continent Radius
+  public static final int CR_CHUNKS = 640;
+  public static final int CR_BLOCKS = CR_CHUNKS * 16;
+
+  // World radius
+  public static final int R_CHUNKS = 896;
+  public static final int R_CHUNKS_SOFT = R_CHUNKS - 4;
+  public static final int R_BLOCKS = R_CHUNKS * 16;
 
   public Worldgen(IEventBus bus) {
     bus.addListener(this::registerDensityFunctionTypes);
@@ -46,8 +52,9 @@ public class Worldgen {
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "edge_ratio"), EdgeRatio.CODEC_HOLDER.codec());
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "land_ratio"), LandRatio.CODEC_HOLDER.codec());
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "lerp"), Lerp.CODEC_HOLDER.codec());
-        helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "x_add_z"), XAddZ.CODEC_HOLDER.codec());
-        helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "x_sub_z"), XSubZ.CODEC_HOLDER.codec());
+        helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "erosion"), Erosion.CODEC_HOLDER.codec());
+        helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "temperature"), Temperature.CODEC_HOLDER.codec());
+        helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "vegetation"), Vegetation.CODEC_HOLDER.codec());
     });
   }
 

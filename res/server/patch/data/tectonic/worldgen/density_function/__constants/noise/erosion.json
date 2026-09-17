@@ -1,29 +1,7 @@
 {
   "type": "minecraft:flat_cache",
   "argument": {
-    "type": "hrt_worldgen:lerp",
-    "delta": "hrt_worldgen:__constants/continent_edge",
-    "start": {
-      "type": "minecraft:clamp",
-      "min": -1.0,
-      "max": 1.0,
-      "input": {
-        "type": "minecraft:mul",
-        "argument1": 5,
-        "argument2": {
-          "type": "minecraft:add",
-          "argument1": -0.55,
-          "argument2": {
-            "type": "minecraft:abs",
-            "argument": {
-              "type": "minecraft:add",
-              "argument1": -0.075,
-              "argument2": "hrt_worldgen:__constants/temperature"
-            }
-          }
-        }
-      }
-    },
-    "end": 0
+    "type": "hrt_worldgen:erosion",
+    "temperature": "tectonic:__constants/noise/temperature"
   }
 }

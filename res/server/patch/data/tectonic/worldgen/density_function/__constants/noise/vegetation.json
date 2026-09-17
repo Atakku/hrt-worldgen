@@ -1,18 +1,13 @@
 {
   "type": "minecraft:flat_cache",
   "argument": {
-    "type": "hrt_worldgen:lerp",
-    "delta": "hrt_worldgen:__constants/world_edge",
-    "start": "hrt_worldgen:__constants/vegetation",
-    "end": {
-      "type": "minecraft:mul",
-      "argument1": 0.15,
-      "argument2": {
-        "type": "minecraft:noise",
-        "noise": "hrt_worldgen:blend",
-        "xz_scale": 1.0,
-        "y_scale": 1.0
-      }
+    "type": "hrt_worldgen:vegetation",
+    "temperature": "tectonic:__constants/noise/temperature",
+    "noise": {
+      "type": "minecraft:noise",
+      "noise": "hrt_worldgen:shit",
+      "xz_scale": 1.0,
+      "y_scale": 1.0
     }
   }
 }
