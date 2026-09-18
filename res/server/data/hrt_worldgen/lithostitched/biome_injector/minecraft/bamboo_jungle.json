@@ -1,0 +1,14 @@
+{
+  "type": "lithostitched:replace_partially",
+  "dimension": "minecraft:overworld",
+  "priority": 100,
+  "targets": [
+    "minecraft:jungle",
+    "minecraft:bamboo_jungle"
+  ],
+  "replacement": "minecraft:bamboo_jungle",
+  "parameters": {
+    "humidity": [0.30, 0.50],
+    "temperature": [0.20, 0.55]
+  }
+}

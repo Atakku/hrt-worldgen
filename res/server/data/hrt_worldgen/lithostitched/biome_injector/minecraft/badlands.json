@@ -1,0 +1,21 @@
+{
+  "type": "lithostitched:replace_partially",
+  "dimension": "minecraft:overworld",
+  "priority": 50,
+  "targets": [
+    "minecraft:wooded_badlands",
+    "minecraft:savanna_plateau",
+    "minecraft:sparse_jungle",
+    "minecraft:jungle",
+    "minecraft:bamboo_jungle",
+    "minecraft:savanna",
+    "minecraft:desert",
+    "minecraft:forest"
+  ],
+  "replacement": "minecraft:badlands",
+  "parameters": {
+    "humidity": [-0.5, 0.5],
+    "temperature": [0.0, 1.0],
+    "erosion": [-1.0, -0.045]
+  }
+}
