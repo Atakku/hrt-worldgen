@@ -5,7 +5,6 @@
 package zone.hrt.worldgen;
 
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Optional;
 
 import net.minecraft.core.registries.Registries;
@@ -28,8 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import zone.hrt.worldgen.func.*;
-import dev.worldgen.lithostitched.api.registry.LithostitchedBuiltInRegistries;
-import dev.worldgen.lithostitched.impl.registry.LithostitchedRegistrar;
 
 @Mod(Worldgen.MOD_ID)
 public class Worldgen {
@@ -48,11 +45,6 @@ public class Worldgen {
   public Worldgen(IEventBus bus) {
     bus.addListener(this::registerDensityFunctionTypes);
     bus.addListener(this::registerEnabledPacks);
-
-    // yes this is kinda cursed but i'm lazy
-    LithostitchedRegistrar.register(LithostitchedBuiltInRegistries.BIOME_INJECTOR_TYPE, Map.ofEntries(
-			Map.entry("replace_points", ReplacePoints.CODEC)
-		));
   }
 
   private void registerDensityFunctionTypes(final RegisterEvent event) {

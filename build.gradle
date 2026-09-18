@@ -3,13 +3,3 @@
 // This project is dual licensed under MIT and Apache.
 
 apply from: 'https://raw.githubusercontent.com/Atakku/gradle/v51/neoforge_build.gradle'
-
-project(':server').repositories {
-  maven {
-    url = "https://api.modrinth.com/maven"
-  }
-}
-
-project(':server').dependencies {
-  implementation "maven.modrinth:XaDC71GB:xDAotknu"
-}
