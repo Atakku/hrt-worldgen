@@ -23,7 +23,7 @@ public record Erosion(DensityFunction temperature) implements DensityFunction.Si
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    double raw = Math.abs(this.temperature.compute(pos) - 0.05) - 0.5;
+    double raw = Math.abs(this.temperature.compute(pos) - 0.05) - 0.53;
     return Mth.clamp(raw * 5, -1, 1);
   }
 
