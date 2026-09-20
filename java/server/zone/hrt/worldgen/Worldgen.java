@@ -53,6 +53,7 @@ public class Worldgen {
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "land_ratio"), LandRatio.CODEC_HOLDER.codec());
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "lerp"), Lerp.CODEC_HOLDER.codec());
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "erosion"), Erosion.CODEC_HOLDER.codec());
+        helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "ridge"), Ridge.CODEC_HOLDER.codec());
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "temperature"), Temperature.CODEC_HOLDER.codec());
         helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "vegetation"), Vegetation.CODEC_HOLDER.codec());
     });
