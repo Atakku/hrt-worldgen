@@ -2,7 +2,15 @@
   "type": "minecraft:flat_cache",
   "argument": {
     "type": "hrt_worldgen:vegetation",
-    "temperature": "tectonic:__constants/noise/temperature",
+    "temperature": {
+      "type": "hrt_worldgen:temperature",
+      "noise": {
+        "type": "minecraft:noise",
+        "noise": "hrt_worldgen:blend",
+        "xz_scale": 1.0,
+        "y_scale": 1.0
+      }
+    },
     "noise": {
       "type": "minecraft:noise",
       "noise": "hrt_worldgen:blend",
