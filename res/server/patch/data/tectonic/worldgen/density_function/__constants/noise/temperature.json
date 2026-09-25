@@ -13,7 +13,7 @@
     },
     "noise": {
       "type": "minecraft:noise",
-      "noise": "hrt_worldgen:noise",
+      "noise": "hrt_worldgen:blend",
       "xz_scale": 1.0,
       "y_scale": 1.0
     }

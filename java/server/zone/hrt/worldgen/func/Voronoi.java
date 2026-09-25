@@ -8,7 +8,7 @@ import java.util.Comparator;
 
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.worldgen.lithostitched.api.worldgen.densityfunction.SimpleContext;
@@ -29,9 +29,9 @@ public record Voronoi(DensityFunction argument, DensityFunction noise) implement
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    Vec2 samplePos = new Vec2(pos.blockX(), pos.blockZ());
-    Vec2 rp = Worldgen.getClosestPoints(x, z).stream().min(Comparator.comparing(p -> Worldgen.distManhattan(p, samplePos))).get();
-    return argument.compute(SimpleContext.of(rp.x, 0, rp.y));
+    Vec3 samplePos = new Vec3(pos.blockX(), noise.compute(pos) * Worldgen.D/6, pos.blockZ());
+    Vec3 rp = Worldgen.getClosestPoints(x, z).stream().min(Comparator.comparing(p -> Worldgen.distManhattan(p, samplePos))).get();
+    return argument.compute(SimpleContext.of(rp.x, 0, rp.z));
     //return Math.sqrt(samplePos.distanceToSqr(rp)) / 512.;
   }
 

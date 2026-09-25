@@ -12,7 +12,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
@@ -66,13 +66,13 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    Vec2 samplePos = new Vec2(pos.blockX(), pos.blockZ());
-    List<Vec2> positions = Worldgen.getClosestPoints(x, z).stream()
+    Vec3 samplePos = new Vec3(pos.blockX(), 0, pos.blockZ());
+    List<Vec3> positions = Worldgen.getClosestPoints(x, z).stream()
         .sorted(Comparator.comparing(p -> Worldgen.distManhattan(p, samplePos))).limit(2)
         .toList();
 
-    Vec2 a = positions.getFirst();
-    Vec2 b = positions.getLast();
+    Vec3 a = positions.getFirst();
+    Vec3 b = positions.getLast();
     // return (Worldgen.distManhattan(b, samplePos) - Worldgen.distManhattan(a,
     // samplePos)) / 256.;
     return (Math.sqrt(Worldgen.distManhattan(b, samplePos)) - Math.sqrt(Worldgen.distManhattan(a, samplePos))) / 20.;
