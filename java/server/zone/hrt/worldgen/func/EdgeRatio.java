@@ -42,6 +42,16 @@ public record EdgeRatio(DensityFunction size, DensityFunction end) implements De
   }
 
   @Override
+  public void fillArray(double[] doubles, ContextProvider ctx) {
+    ctx.fillAllDirectly(doubles, this);
+  }
+
+  @Override
+  public DensityFunction mapAll(Visitor visitor) {
+    return visitor.apply(new EdgeRatio(size.mapAll(visitor), end.mapAll(visitor)));
+  }
+
+  @Override
   public double minValue() {
     return 0;
   }

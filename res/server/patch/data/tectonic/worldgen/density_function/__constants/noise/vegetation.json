@@ -1,19 +1,28 @@
 {
   "type": "minecraft:flat_cache",
   "argument": {
-    "type": "hrt_worldgen:vegetation",
-    "temperature": {
-      "type": "hrt_worldgen:temperature",
+    "type": "hrt_worldgen:voronoi",
+    "argument": {
+      "type": "hrt_worldgen:vegetation",
+      "temperature": {
+        "type": "hrt_worldgen:temperature",
+        "noise": {
+          "type": "minecraft:noise",
+          "noise": "hrt_worldgen:noise",
+          "xz_scale": 1.0,
+          "y_scale": 1.0
+        }
+      },
       "noise": {
         "type": "minecraft:noise",
-        "noise": "hrt_worldgen:blend",
+        "noise": "hrt_worldgen:noise",
         "xz_scale": 1.0,
         "y_scale": 1.0
       }
     },
     "noise": {
       "type": "minecraft:noise",
-      "noise": "hrt_worldgen:blend",
+      "noise": "hrt_worldgen:noise",
       "xz_scale": 1.0,
       "y_scale": 1.0
     }

@@ -4,21 +4,23 @@
 
 package zone.hrt.worldgen.func;
 
+import java.util.Comparator;
+import java.util.List;
+
 import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.phys.Vec2;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
 
-public record Ridge(DensityFunction temperature, DensityFunction vegetation, DensityFunction noise) implements DensityFunction.SimpleFunction {
+public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Ridge> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("temperature").forGetter(Ridge::temperature),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("vegetation").forGetter(Ridge::vegetation),
-          DensityFunction.DIRECT_CODEC.fieldOf("noise").forGetter(Ridge::noise))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Ridge::noise))
           .apply(instance, Ridge::new)));
 
   private static final CubicSpline<Float, ToFloatFunction<Float>> TEM_SPLINE = buildSpline(
@@ -42,10 +44,10 @@ public record Ridge(DensityFunction temperature, DensityFunction vegetation, Den
       float point = points[i];
       int sign = (i % 2 == 0) ? 1 : -1;
 
-      float start = i > 0 ? Mth.lerp(0.55f, points[i - 1], point): point -
-      (points[i + 1] - point);
-      float end = i < points.length - 1 ? Mth.lerp(0.45f, point, points[i + 1]) :
-      point + (point - points[i - 1]);
+      float start = i > 0 ? Mth.lerp(0.55f, points[i - 1], point)
+          : point -
+              (points[i + 1] - point);
+      float end = i < points.length - 1 ? Mth.lerp(0.45f, point, points[i + 1]) : point + (point - points[i - 1]);
 
       spline = spline.addPoint(start, sign * -1.5f, 0f);
       spline = spline.addPoint(point - radius * 1.25f, sign * -THRESHOLD, 0f);
@@ -64,12 +66,26 @@ public record Ridge(DensityFunction temperature, DensityFunction vegetation, Den
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    float tem = TEM_SPLINE.apply((float) temperature.compute(pos));
-    float veg = VEG_SPLINE.apply((float) vegetation.compute(pos));
+    Vec2 samplePos = new Vec2(pos.blockX(), pos.blockZ());
+    List<Vec2> positions = Worldgen.getClosestPoints(x, z).stream()
+        .sorted(Comparator.comparing(p -> Worldgen.distManhattan(p, samplePos))).limit(2)
+        .toList();
 
-    float river = Math.min(Math.abs(tem), Math.abs(veg));
-    double land = Math.min(Math.abs(noise.compute(pos)), THRESHOLD);
-    return Math.copySign(Math.min(river, land), tem * veg);
+    Vec2 a = positions.getFirst();
+    Vec2 b = positions.getLast();
+    // return (Worldgen.distManhattan(b, samplePos) - Worldgen.distManhattan(a,
+    // samplePos)) / 256.;
+    return (Math.sqrt(Worldgen.distManhattan(b, samplePos)) - Math.sqrt(Worldgen.distManhattan(a, samplePos))) / 20.;
+
+    // Vec3i realPos =
+    // Worldgen.POINTS.stream().min(Comparator.comparing(samplePos::distSqr)).get();
+
+    // float tem = TEM_SPLINE.apply((float) temperature.compute(pos));
+    // float veg = VEG_SPLINE.apply((float) vegetation.compute(pos));
+
+    // float river = Math.min(Math.abs(tem), Math.abs(veg));
+    // double land = Math.min(Math.abs(noise.compute(pos)), THRESHOLD);
+    // return Math.copySign(Math.min(river, land), tem * veg);
   }
 
   @Override
@@ -79,7 +95,7 @@ public record Ridge(DensityFunction temperature, DensityFunction vegetation, Den
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Ridge(temperature.mapAll(visitor), vegetation.mapAll(visitor), noise.mapAll(visitor)));
+    return visitor.apply(new Ridge(noise.mapAll(visitor)));
   }
 
   @Override
