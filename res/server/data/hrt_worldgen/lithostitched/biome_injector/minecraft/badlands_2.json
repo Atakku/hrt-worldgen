@@ -1,0 +1,10 @@
+{
+  "type": "lithostitched:replace_partially",
+  "dimension": "minecraft:overworld",
+  "priority": 75,
+  "targets": "minecraft:wooded_badlands",
+  "replacement": "minecraft:badlands",
+  "parameters": {
+    "humidity": [-0.1, 0.2]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "lithostitched:replace_partially",
+  "dimension": "minecraft:overworld",
+  "targets": "minecraft:desert",
+  "replacement": "regions_unexplored:joshua_desert",
+  "parameters": {
+    "humidity": [
+      -0.1, 0.2
+    ],
+    "temperature": [
+      0.765, 1.0
+    ]
+  }
+}

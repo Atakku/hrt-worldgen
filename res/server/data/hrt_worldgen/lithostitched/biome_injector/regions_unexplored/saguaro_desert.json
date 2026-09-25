@@ -1,0 +1,11 @@
+{
+  "type": "lithostitched:replace_partially",
+  "dimension": "minecraft:overworld",
+  "targets": "minecraft:desert",
+  "replacement": "regions_unexplored:saguaro_desert",
+  "parameters": {
+    "humidity": [
+      0.2, 1.0
+    ]
+  }
+}

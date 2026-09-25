@@ -4,8 +4,9 @@
 
 package zone.hrt.worldgen.func;
 
+import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
-import net.minecraft.util.Mth;
+import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
@@ -16,6 +17,20 @@ public record Erosion(DensityFunction temperature) implements DensityFunction.Si
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("temperature").forGetter(Erosion::temperature))
           .apply(instance, Erosion::new)));
 
+  private static final CubicSpline<Float, ToFloatFunction<Float>> MNT_SPLINE;
+
+  static {
+    float radius = 0.125f;
+
+    CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
+    for (float peak : new float[] { -0.48f, 0.58f }) {
+      spline = spline.addPoint(peak - radius, 0.4f, 0f);
+      spline = spline.addPoint(peak, 0f, 0f);
+      spline = spline.addPoint(peak + radius, 0.4f, 0f);
+    }
+    MNT_SPLINE = spline.build();
+  }
+
   public double compute(DensityFunction.FunctionContext pos) {
     int x = pos.blockX();
     int z = pos.blockZ();
@@ -23,8 +38,7 @@ public record Erosion(DensityFunction temperature) implements DensityFunction.Si
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    double raw = Math.abs(this.temperature.compute(pos) - 0.05) - 0.53;
-    return Mth.clamp(raw * 5, -1, 1);
+    return MNT_SPLINE.apply((float) this.temperature.compute(pos));
   }
 
   @Override
@@ -39,12 +53,12 @@ public record Erosion(DensityFunction temperature) implements DensityFunction.Si
 
   @Override
   public double minValue() {
-    return -1;
+    return MNT_SPLINE.minValue();
   }
 
   @Override
   public double maxValue() {
-    return 1;
+    return MNT_SPLINE.maxValue();
   }
 
   @Override

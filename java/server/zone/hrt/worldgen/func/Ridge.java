@@ -13,21 +13,22 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
 
-public record Ridge(DensityFunction temperature, DensityFunction vegetation) implements DensityFunction.SimpleFunction {
+public record Ridge(DensityFunction temperature, DensityFunction vegetation, DensityFunction noise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Ridge> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("temperature").forGetter(Ridge::temperature),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("vegetation").forGetter(Ridge::vegetation))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("vegetation").forGetter(Ridge::vegetation),
+          DensityFunction.DIRECT_CODEC.fieldOf("noise").forGetter(Ridge::noise))
           .apply(instance, Ridge::new)));
 
   private static final CubicSpline<Float, ToFloatFunction<Float>> TEM_SPLINE = buildSpline(
-      new float[] { -0.9f, -0.48f, -0.15f, 0.2f, 0.58f, 0.95f});
+      new float[] { -0.9f, -0.48f, -0.15f, 0.2f, 0.58f, 0.95f }, 0.0075f);
   private static final CubicSpline<Float, ToFloatFunction<Float>> VEG_SPLINE = buildSpline(
-      new float[] { -0.5f, -0.35f, -0.1f, 0.1f, 0.3f, 0.5f });
+      new float[] { -0.5f, -0.35f, -0.1f, 0.1f, 0.3f, 0.5f }, 0.0075f);
 
-  private static final float RADIUS = 0.0075f;
+  private static final float THRESHOLD = 0.08f;
 
-  private static final CubicSpline<Float, ToFloatFunction<Float>> buildSpline(float[] input) {
+  private static final CubicSpline<Float, ToFloatFunction<Float>> buildSpline(float[] input, float radius) {
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
     float[] points = new float[input.length * 2 - 1];
     int resIndex = 0;
@@ -41,18 +42,17 @@ public record Ridge(DensityFunction temperature, DensityFunction vegetation) imp
       float point = points[i];
       int sign = (i % 2 == 0) ? 1 : -1;
 
-      float start = i > 0 ? Mth.lerp(0.66f, points[i - 1], point): point - (points[i + 1] - point);
-      float end = i < points.length - 1 ? Mth.lerp(0.33f, point, points[i + 1]) : point + (point - points[i - 1]);
+      float start = i > 0 ? Mth.lerp(0.55f, points[i - 1], point): point -
+      (points[i + 1] - point);
+      float end = i < points.length - 1 ? Mth.lerp(0.45f, point, points[i + 1]) :
+      point + (point - points[i - 1]);
 
-      spline = spline.addPoint(start, sign * -0.75f, 0f);
-      spline = spline.addPoint(point - RADIUS * 1.25f, sign * -0.08f, 0f);
-      spline = spline.addPoint(point - RADIUS, sign * -0.08f, 0f);
-      //spline = spline.addPoint(point - RADIUS * 0.5f, sign * -0.035f, 0f);
-      //spline = spline.addPoint(point, 0, 0f);
-      //spline = spline.addPoint(point + RADIUS * 0.5f, sign * 0.035f, 0f);
-      spline = spline.addPoint(point + RADIUS, sign * 0.08f, 0f);
-      spline = spline.addPoint(point + RADIUS * 1.25f, sign * 0.08f, 0f);
-      spline = spline.addPoint(end, sign * 0.75f, 0f);
+      spline = spline.addPoint(start, sign * -1.5f, 0f);
+      spline = spline.addPoint(point - radius * 1.25f, sign * -THRESHOLD, 0f);
+      spline = spline.addPoint(point - radius, sign * -THRESHOLD, 0f);
+      spline = spline.addPoint(point + radius, sign * THRESHOLD, 0f);
+      spline = spline.addPoint(point + radius * 1.25f, sign * THRESHOLD, 0f);
+      spline = spline.addPoint(end, sign * 1.5f, 0f);
     }
     return spline.build();
   }
@@ -64,9 +64,12 @@ public record Ridge(DensityFunction temperature, DensityFunction vegetation) imp
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    float tem = TEM_SPLINE.apply((float) this.temperature.compute(pos));
-    float veg = VEG_SPLINE.apply((float) this.vegetation.compute(pos));
-    return Math.copySign(Math.min(Math.abs(tem), Math.abs(veg)), tem * veg);
+    float tem = TEM_SPLINE.apply((float) temperature.compute(pos));
+    float veg = VEG_SPLINE.apply((float) vegetation.compute(pos));
+
+    float river = Math.min(Math.abs(tem), Math.abs(veg));
+    double land = Math.min(Math.abs(noise.compute(pos)), THRESHOLD);
+    return Math.copySign(Math.min(river, land), tem * veg);
   }
 
   @Override
@@ -76,17 +79,17 @@ public record Ridge(DensityFunction temperature, DensityFunction vegetation) imp
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Ridge(temperature.mapAll(visitor), vegetation.mapAll(visitor)));
+    return visitor.apply(new Ridge(temperature.mapAll(visitor), vegetation.mapAll(visitor), noise.mapAll(visitor)));
   }
 
   @Override
   public double minValue() {
-    return TEM_SPLINE.minValue() * VEG_SPLINE.minValue();
+    return Math.min(TEM_SPLINE.minValue(), VEG_SPLINE.minValue());
   }
 
   @Override
   public double maxValue() {
-    return TEM_SPLINE.maxValue() * VEG_SPLINE.maxValue();
+    return Math.max(TEM_SPLINE.maxValue(), VEG_SPLINE.maxValue());
   }
 
   @Override
