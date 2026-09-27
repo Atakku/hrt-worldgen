@@ -9,7 +9,6 @@ import java.util.List;
 
 import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
-import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.phys.Vec3;
@@ -23,40 +22,17 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Ridge::noise))
           .apply(instance, Ridge::new)));
 
-  private static final CubicSpline<Float, ToFloatFunction<Float>> TEM_SPLINE = buildSpline(
-      new float[] { -0.9f, -0.48f, -0.15f, 0.2f, 0.58f, 0.95f }, 0.0075f);
-  private static final CubicSpline<Float, ToFloatFunction<Float>> VEG_SPLINE = buildSpline(
-      new float[] { -0.5f, -0.35f, -0.1f, 0.1f, 0.3f, 0.5f }, 0.0075f);
+  private static final int SIZE = 40;
+  private static final CubicSpline<Float, ToFloatFunction<Float>> SPLINE;
 
-  private static final float THRESHOLD = 0.08f;
-
-  private static final CubicSpline<Float, ToFloatFunction<Float>> buildSpline(float[] input, float radius) {
+  static {
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
-    float[] points = new float[input.length * 2 - 1];
-    int resIndex = 0;
-    for (int i = 0; i < input.length - 1; i++) {
-      points[resIndex++] = input[i];
-      points[resIndex++] = (input[i] + input[i + 1]) / 2;
-    }
-    points[resIndex] = input[input.length - 1];
 
-    for (int i = 0; i < points.length; i++) {
-      float point = points[i];
-      int sign = (i % 2 == 0) ? 1 : -1;
+    spline = spline.addPoint(-SIZE, -0.08f, 0f);
+    spline = spline.addPoint(SIZE, 0.08f, 0f);
+    spline = spline.addPoint(SIZE * 1.25f, 0.08f, 0f);
 
-      float start = i > 0 ? Mth.lerp(0.55f, points[i - 1], point)
-          : point -
-              (points[i + 1] - point);
-      float end = i < points.length - 1 ? Mth.lerp(0.45f, point, points[i + 1]) : point + (point - points[i - 1]);
-
-      spline = spline.addPoint(start, sign * -1.5f, 0f);
-      spline = spline.addPoint(point - radius * 1.25f, sign * -THRESHOLD, 0f);
-      spline = spline.addPoint(point - radius, sign * -THRESHOLD, 0f);
-      spline = spline.addPoint(point + radius, sign * THRESHOLD, 0f);
-      spline = spline.addPoint(point + radius * 1.25f, sign * THRESHOLD, 0f);
-      spline = spline.addPoint(end, sign * 1.5f, 0f);
-    }
-    return spline.build();
+    SPLINE = spline.build();
   }
 
   public double compute(DensityFunction.FunctionContext pos) {
@@ -76,23 +52,16 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
 
     Vec3 a = positions.getFirst();
     Vec3 b = positions.getLast();
+    Vec3 c = a.add(b).scale(0.5);
 
-    return Math.copySign(Mth.clamp((samplePos.distanceTo(a) - samplePos.distanceTo(b)) / 512., -1, 1), a.y);
+    double da = a.z - b.z;
+    double db = b.x - a.x;
+    double dc = da * c.z - db * c.x;
 
-    // return Math.copySign(Mth.clamp(Worldgen.distManhattan(samplePos,
-    // a.add(b).scale(0.5)) / 200., -1, 1), a.y);
-    // return Math.copySign(Mth.clamp(Worldgen.distManhattan(a, b) / 2000., -1, 1),
-    // a.y);
+    double dist = Math.abs(db * samplePos.x - da * samplePos.z + dc) / Math.sqrt(da * da + db * db);
+    return Math.copySign(SPLINE.apply((float) dist), a.y);
 
-    // Vec3i realPos =
-    // Worldgen.POINTS.stream().min(Comparator.comparing(samplePos::distSqr)).get();
-
-    // float tem = TEM_SPLINE.apply((float) temperature.compute(pos));
-    // float veg = VEG_SPLINE.apply((float) vegetation.compute(pos));
-
-    // float river = Math.min(Math.abs(tem), Math.abs(veg));
-    // double land = Math.min(Math.abs(noise.compute(pos)), THRESHOLD);
-    // return Math.copySign(Math.min(river, land), tem * veg);
+    //Math.copySign(Mth.clamp((samplePos.distanceTo(a) - samplePos.distanceTo(b)) / 512., -1, 1), a.y);
   }
 
   @Override
@@ -107,12 +76,12 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
 
   @Override
   public double minValue() {
-    return Math.min(TEM_SPLINE.minValue(), VEG_SPLINE.minValue());
+    return -SPLINE.maxValue();
   }
 
   @Override
   public double maxValue() {
-    return Math.max(TEM_SPLINE.maxValue(), VEG_SPLINE.maxValue());
+    return SPLINE.maxValue();
   }
 
   @Override

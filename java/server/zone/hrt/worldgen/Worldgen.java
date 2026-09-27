@@ -69,7 +69,7 @@ public class Worldgen {
   }
 
   private static Vec3 getPoint(int cx, int cz) {
-    return new Vec3(sample(cx, cz) * D, 0, sample(cz, cx) * D);
+    return new Vec3(sample(cx, cz) * D, Math.abs(cx + cz) % 2 - 0.5, sample(cz, cx) * D);
   }
 
   private static float sample(int input, int seed) {
