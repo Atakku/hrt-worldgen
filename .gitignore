@@ -40,3 +40,5 @@ replay_*.log
 
 # generated
 genJava/
+.vscode/launch.json
+res/server/data/hrt_worldgen/lithostitched/biome_injector/generated

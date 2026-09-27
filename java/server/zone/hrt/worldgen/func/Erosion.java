@@ -38,7 +38,7 @@ public record Erosion(DensityFunction temperature) implements DensityFunction.Si
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    return MNT_SPLINE.apply((float) this.temperature.compute(pos));
+    return MNT_SPLINE.apply((float) temperature.compute(pos));
   }
 
   @Override

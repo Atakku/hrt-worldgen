@@ -18,8 +18,7 @@ public record Voronoi(DensityFunction argument, DensityFunction noise) implement
   public static final KeyDispatchDataCodec<Voronoi> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("argument").forGetter(Voronoi::argument),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Voronoi::noise)
-        )
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Voronoi::noise))
           .apply(instance, Voronoi::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
@@ -29,10 +28,12 @@ public record Voronoi(DensityFunction argument, DensityFunction noise) implement
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    Vec3 samplePos = new Vec3(pos.blockX(), noise.compute(pos) * Worldgen.D/6, pos.blockZ());
-    Vec3 rp = Worldgen.getClosestPoints(x, z).stream().min(Comparator.comparing(p -> Worldgen.distManhattan(p, samplePos))).get();
+    double noise = this.noise.compute(pos) * Worldgen.D / 4;
+    Vec3 samplePos = new Vec3(x, noise, z);
+
+    Vec3 rp = Worldgen.getClosestPoints(x, z).stream().min(Comparator.comparing(samplePos::distanceToSqr)).get();
     return argument.compute(SimpleContext.of(rp.x, 0, rp.z));
-    //return Math.sqrt(samplePos.distanceToSqr(rp)) / 512.;
+    // return Math.sqrt(samplePos.distanceToSqr(rp)) / 512.;
   }
 
   @Override
@@ -42,7 +43,7 @@ public record Voronoi(DensityFunction argument, DensityFunction noise) implement
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Voronoi(argument.mapAll(visitor), argument.mapAll(visitor)));
+    return visitor.apply(new Voronoi(argument.mapAll(visitor), noise.mapAll(visitor)));
   }
 
   @Override

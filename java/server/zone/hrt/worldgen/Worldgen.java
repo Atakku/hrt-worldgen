@@ -47,7 +47,7 @@ public class Worldgen {
   public static final int R_BLOCKS = R_CHUNKS * 16;
 
   // Voronoi Points
-  public static final float D = 2048f;
+  public static final float D = 1024f;
   private static final HashFunction MUR = Hashing.murmur3_32_fixed(0);
 
   public static List<Vec3> getClosestPoints(int x, int z) {
@@ -69,15 +69,11 @@ public class Worldgen {
   }
 
   private static Vec3 getPoint(int cx, int cz) {
-    return new Vec3(sample(cx, cz) * D, Math.sin(cx + cz) * D/6., sample(cz, cx) * D);
+    return new Vec3(sample(cx, cz) * D, Math.sin(sample(cx * 4 + cz, cz * 4 + cx)) * D/4., sample(cz, cx) * D);
   }
 
   private static float sample(int input, int seed) {
     return ((((float)Integer.toUnsignedLong(MUR.hashInt(input + seed * 12345).asInt())) / (1L << 32) - 0.5f) * 0.9f + input);
-  }
-
-  public static double distManhattan(Vec3 a, Vec3 b) {
-    return (Math.abs(a.x - b.x) + Math.abs(a.y - b.y) + Math.abs(a.z - b.z));
   }
 
   public Worldgen(IEventBus bus) {

@@ -1,0 +1,14 @@
+{
+  "type": "hrt_worldgen:voronoi",
+  "argument": {
+    "type": "hrt_worldgen:vegetation",
+    "temperature": "hrt_worldgen:temperature",
+    "noise": 0
+  },
+  "noise": {
+    "type": "minecraft:noise",
+    "noise": "hrt_worldgen:blend",
+    "xz_scale": 1.0,
+    "y_scale": 1.0
+  }
+}

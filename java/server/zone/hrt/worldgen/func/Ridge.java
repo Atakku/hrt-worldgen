@@ -66,16 +66,22 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    Vec3 samplePos = new Vec3(pos.blockX(), 0, pos.blockZ());
+    double noise = this.noise.compute(pos) * Worldgen.D / 6;
+    Vec3 samplePos = new Vec3(x, noise, z);
+
     List<Vec3> positions = Worldgen.getClosestPoints(x, z).stream()
-        .sorted(Comparator.comparing(p -> Worldgen.distManhattan(p, samplePos))).limit(2)
+        .sorted(Comparator.comparing(samplePos::distanceToSqr)).limit(2)
         .toList();
 
     Vec3 a = positions.getFirst();
     Vec3 b = positions.getLast();
-    // return (Worldgen.distManhattan(b, samplePos) - Worldgen.distManhattan(a,
-    // samplePos)) / 256.;
-    return (Math.sqrt(Worldgen.distManhattan(b, samplePos)) - Math.sqrt(Worldgen.distManhattan(a, samplePos))) / 20.;
+
+    return Math.copySign(Mth.clamp((samplePos.distanceTo(a) - samplePos.distanceTo(b)) / 512., -1, 1), a.y);
+
+    // return Math.copySign(Mth.clamp(Worldgen.distManhattan(samplePos,
+    // a.add(b).scale(0.5)) / 200., -1, 1), a.y);
+    // return Math.copySign(Mth.clamp(Worldgen.distManhattan(a, b) / 2000., -1, 1),
+    // a.y);
 
     // Vec3i realPos =
     // Worldgen.POINTS.stream().min(Comparator.comparing(samplePos::distSqr)).get();
