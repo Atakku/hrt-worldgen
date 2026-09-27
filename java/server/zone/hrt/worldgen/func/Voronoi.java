@@ -11,7 +11,6 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import dev.worldgen.lithostitched.api.worldgen.densityfunction.SimpleContext;
 import zone.hrt.worldgen.Worldgen;
 
 public record Voronoi(DensityFunction argument, DensityFunction noise) implements DensityFunction.SimpleFunction {
@@ -28,12 +27,12 @@ public record Voronoi(DensityFunction argument, DensityFunction noise) implement
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    double noise = this.noise.compute(pos) * Worldgen.D / 4;
-    Vec3 samplePos = new Vec3(x, noise, z);
+    double nx = this.noise.compute(pos);
+    double nz = this.noise.compute(new SinglePointContext(pos.blockX(), pos.blockY() + 10000, pos.blockZ()));
+    Vec3 samplePos = new Vec3(x + nx, 0, z + nz);
 
     Vec3 rp = Worldgen.getClosestPoints(x, z).stream().min(Comparator.comparing(samplePos::distanceToSqr)).get();
-    return argument.compute(SimpleContext.of(rp.x, 0, rp.z));
-    // return Math.sqrt(samplePos.distanceToSqr(rp)) / 512.;
+    return argument.compute(new SinglePointContext((int)rp.x, 0, (int)rp.z));
   }
 
   @Override

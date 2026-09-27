@@ -66,8 +66,9 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
       return 0;
 
-    double noise = this.noise.compute(pos) * Worldgen.D / 6;
-    Vec3 samplePos = new Vec3(x, noise, z);
+    double nx = this.noise.compute(pos);
+    double nz = this.noise.compute(new SinglePointContext(pos.blockX(), pos.blockY() + 10000, pos.blockZ()));
+    Vec3 samplePos = new Vec3(x + nx, 0, z + nz);
 
     List<Vec3> positions = Worldgen.getClosestPoints(x, z).stream()
         .sorted(Comparator.comparing(samplePos::distanceToSqr)).limit(2)
