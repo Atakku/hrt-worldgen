@@ -40,20 +40,25 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
       return 0;
 
     Vec3 samplePos = Worley.getSamplePos(noise, pos);
-    List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).limit(2).toList();
+    List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).limit(4).toList();
 
-    Vec3 a = positions.getFirst();
-    Vec3 b = positions.getLast();
+    Vec3 a = positions.get(0);
+    double d1 = edgeDist(samplePos, a, positions.get(1));
+    double d2 = edgeDist(samplePos, a, positions.get(2));
+    double d3 = edgeDist(samplePos, a, positions.get(3));
+
+    double dist = Math.min(d1, Math.min(d2, d3));
+    return Math.copySign(SPLINE.apply((float) dist), a.y);
+  }
+
+  private static final double edgeDist(Vec3 pos, Vec3 a, Vec3 b) {
     Vec3 c = a.add(b).scale(0.5);
 
     double da = a.z - b.z;
     double db = b.x - a.x;
     double dc = da * c.z - db * c.x;
 
-    double dist = Math.abs(db * samplePos.x - da * samplePos.z + dc) / Math.sqrt(da * da + db * db);
-    return Math.copySign(SPLINE.apply((float) dist), a.y);
-
-    //Math.copySign(Mth.clamp((samplePos.distanceTo(a) - samplePos.distanceTo(b)) / 512., -1, 1), a.y);
+    return Math.abs(db * pos.x - da * pos.z + dc) / Math.sqrt(da * da + db * db);
   }
 
   @Override
