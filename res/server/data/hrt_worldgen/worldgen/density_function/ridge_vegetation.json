@@ -1,5 +1,6 @@
 {
-  "type": "hrt_worldgen:ridge",
+  "type": "hrt_worldgen:voronoi",
+  "argument": "hrt_worldgen:raw_vegetation",
   "noise": {
     "type": "minecraft:noise",
     "noise": "hrt_worldgen:ridge",

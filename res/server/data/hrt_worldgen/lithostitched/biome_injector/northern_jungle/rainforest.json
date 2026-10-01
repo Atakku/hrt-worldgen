@@ -8,6 +8,6 @@
   "replacement": "regions_unexplored:rainforest",
   "parameters": {
     "humidity": [0.30, 0.50],
-    "temperature": [0.20, 0.39]
+    "temperature": [0.20, 0.37]
   }
 }

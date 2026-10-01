@@ -10,6 +10,6 @@
   "replacement": "regions_unexplored:eucalyptus_forest",
   "parameters": {
     "humidity": [0.40, 0.50],
-    "temperature": [0.39, 0.55]
+    "temperature": [0.37, 0.55]
   }
 }

@@ -1,8 +1,8 @@
 {
-  "type": "hrt_worldgen:ridge",
+  "type": "hrt_worldgen:temperature",
   "noise": {
     "type": "minecraft:noise",
-    "noise": "hrt_worldgen:ridge",
+    "noise": "hrt_worldgen:global",
     "xz_scale": 1.0,
     "y_scale": 1.0
   }

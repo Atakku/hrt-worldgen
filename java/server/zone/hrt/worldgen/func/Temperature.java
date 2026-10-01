@@ -20,7 +20,7 @@ public record Temperature(DensityFunction noise) implements DensityFunction.Simp
     int x = pos.blockX();
     int z = pos.blockZ();
 
-    if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
+    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
     double noise = this.noise.compute(pos);

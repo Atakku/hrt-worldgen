@@ -21,7 +21,7 @@ public record Vegetation(DensityFunction temperature, DensityFunction noise) imp
     int x = pos.blockX();
     int z = pos.blockZ();
 
-    if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
+    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
     double temp = this.temperature.compute(pos);

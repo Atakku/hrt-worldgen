@@ -5,7 +5,6 @@
 package zone.hrt.worldgen;
 
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Optional;
 
 import net.minecraft.core.registries.Registries;
@@ -18,10 +17,8 @@ import net.minecraft.server.packs.PathPackResources;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.levelgen.DensityFunction;
 
-import com.google.common.hash.HashFunction;
-import com.google.common.hash.Hashing;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
@@ -45,36 +42,6 @@ public class Worldgen {
   public static final int R_CHUNKS = 896;
   public static final int R_CHUNKS_SOFT = R_CHUNKS - 4;
   public static final int R_BLOCKS = R_CHUNKS * 16;
-
-  // Voronoi Points
-  public static final float D = 1024f;
-  private static final HashFunction MUR = Hashing.murmur3_32_fixed(0);
-
-  public static List<Vec3> getClosestPoints(int x, int z) {
-    int xd = (int) Math.round(x / D);
-    int zd = (int) Math.round(z / D);
-
-    //System.out.println( lx + " " + hx + " " + lz + " " + hz);
-
-    return List.of(
-        getPoint(xd - 1, zd - 1),
-        getPoint(xd - 1, zd),
-        getPoint(xd - 1, zd + 1),
-        getPoint(xd, zd - 1),
-        getPoint(xd, zd),
-        getPoint(xd, zd + 1),
-        getPoint(xd + 1, zd - 1),
-        getPoint(xd + 1, zd),
-        getPoint(xd + 1, zd + 1));
-  }
-
-  private static Vec3 getPoint(int cx, int cz) {
-    return new Vec3(sample(cx, cz) * D, Math.abs(cx + cz) % 2 - 0.5, sample(cz, cx) * D);
-  }
-
-  private static float sample(int input, int seed) {
-    return ((((float)Integer.toUnsignedLong(MUR.hashInt(input + seed * 12345).asInt())) / (1L << 32) - 0.5f) * 0.9f + input);
-  }
 
   public Worldgen(IEventBus bus) {
     bus.addListener(this::registerDensityFunctionTypes);
@@ -117,6 +84,14 @@ public class Worldgen {
   }
 
   public static boolean isOutside(ChunkPos p, int b) {
-    return p.x >= b || p.z >= b || p.x < -b || p.z < -b;
+    return isOutside(p.x, p.z, b);
+  }
+
+  public static boolean isOutside(DensityFunction.FunctionContext p, int b) {
+    return isOutside(p.blockX(), p.blockZ(), b);
+  }
+
+  public static boolean isOutside(int x, int z, int b) {
+    return x >= b || z >= b || x < -b || z < -b;
   }
 }

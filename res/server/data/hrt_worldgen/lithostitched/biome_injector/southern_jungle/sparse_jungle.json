@@ -1,16 +1,14 @@
 {
   "type": "lithostitched:replace_partially",
   "dimension": "minecraft:overworld",
-  "priority": 1500,
+  "priority": 2000,
   "targets": [
     "minecraft:plains",
-    "minecraft:sparse_jungle",
-    "minecraft:jungle",
     "minecraft:forest"
   ],
-  "replacement": "minecraft:jungle",
+  "replacement": "minecraft:sparse_jungle",
   "parameters": {
-    "humidity": [0, 0.20],
-    "temperature": [0.39, 0.55]
+    "humidity": [-0.10, 0.10],
+    "temperature": [0.37, 0.55]
   }
 }

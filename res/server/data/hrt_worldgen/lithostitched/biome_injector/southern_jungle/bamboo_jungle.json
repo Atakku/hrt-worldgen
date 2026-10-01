@@ -9,7 +9,7 @@
   ],
   "replacement": "minecraft:bamboo_jungle",
   "parameters": {
-    "humidity": [0.20, 0.30],
-    "temperature": [0.20, 0.55]
+    "humidity": [0.15, 0.25],
+    "temperature": [0.37, 0.55]
   }
 }

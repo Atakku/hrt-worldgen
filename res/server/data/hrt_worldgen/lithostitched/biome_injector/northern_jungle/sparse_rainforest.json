@@ -2,13 +2,13 @@
   "type": "lithostitched:replace_partially",
   "dimension": "minecraft:overworld",
   "targets": [
-    "minecraft:jungle",
     "minecraft:sparse_jungle",
+    "minecraft:jungle",
     "minecraft:forest"
   ],
-  "replacement": "regions_unexplored:bamboo_forest",
+  "replacement": "regions_unexplored:sparse_rainforest",
   "parameters": {
-    "humidity": [0.30, 0.40],
-    "temperature": [0.20, 0.55]
+    "humidity": [0.10, 0.30],
+    "temperature": [0.20, 0.37]
   }
 }

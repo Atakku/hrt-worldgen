@@ -1,4 +1,4 @@
 {
   "type": "minecraft:flat_cache",
-  "argument": "hrt_worldgen:temperature"
+  "argument": "hrt_worldgen:ridge_temperature"
 }

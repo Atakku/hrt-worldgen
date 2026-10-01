@@ -4,7 +4,6 @@
 
 package zone.hrt.worldgen.func;
 
-import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.util.CubicSpline;
@@ -15,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
+import zone.hrt.worldgen.Worley;
 
 public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Ridge> CODEC_HOLDER = KeyDispatchDataCodec
@@ -36,19 +36,11 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
   }
 
   public double compute(DensityFunction.FunctionContext pos) {
-    int x = pos.blockX();
-    int z = pos.blockZ();
-
-    if (x >= Worldgen.R_BLOCKS || z >= Worldgen.R_BLOCKS || x < -Worldgen.R_BLOCKS || z < -Worldgen.R_BLOCKS)
+    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
-    double nx = this.noise.compute(pos);
-    double nz = this.noise.compute(new SinglePointContext(pos.blockX(), pos.blockY() + 10000, pos.blockZ()));
-    Vec3 samplePos = new Vec3(x + nx, 0, z + nz);
-
-    List<Vec3> positions = Worldgen.getClosestPoints(x, z).stream()
-        .sorted(Comparator.comparing(samplePos::distanceToSqr)).limit(2)
-        .toList();
+    Vec3 samplePos = Worley.getSamplePos(noise, pos);
+    List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).limit(2).toList();
 
     Vec3 a = positions.getFirst();
     Vec3 b = positions.getLast();

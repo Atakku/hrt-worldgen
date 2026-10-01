@@ -1,12 +1,9 @@
 {
   "type": "hrt_worldgen:voronoi",
-  "argument": {
-    "type": "hrt_worldgen:temperature",
-    "noise": 0
-  },
+  "argument": "hrt_worldgen:raw_temperature",
   "noise": {
     "type": "minecraft:noise",
-    "noise": "hrt_worldgen:blend",
+    "noise": "hrt_worldgen:ridge",
     "xz_scale": 1.0,
     "y_scale": 1.0
   }

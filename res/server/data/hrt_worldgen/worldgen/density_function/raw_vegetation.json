@@ -1,9 +1,9 @@
 {
-  "type": "hrt_worldgen:erosion",
+  "type": "hrt_worldgen:vegetation",
   "temperature": "hrt_worldgen:raw_temperature",
   "noise": {
     "type": "minecraft:noise",
-    "noise": "hrt_worldgen:erosion",
+    "noise": "hrt_worldgen:global",
     "xz_scale": 1.0,
     "y_scale": 1.0
   }
