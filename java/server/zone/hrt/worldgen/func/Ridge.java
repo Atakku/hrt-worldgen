@@ -8,8 +8,10 @@ import java.util.List;
 
 import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
+import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.level.levelgen.DensityFunctions.Spline;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -23,6 +25,9 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
           .apply(instance, Ridge::new)));
 
   private static final int SIZE = 40;
+  private static final int BANK = 10;
+  private static final int THRES = 100;
+
   private static final CubicSpline<Float, ToFloatFunction<Float>> SPLINE;
 
   static {
@@ -30,7 +35,8 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
 
     spline = spline.addPoint(-SIZE, -0.08f, 0f);
     spline = spline.addPoint(SIZE, 0.08f, 0f);
-    spline = spline.addPoint(SIZE * 1.25f, 0.08f, 0f);
+    spline = spline.addPoint(SIZE + BANK, 0.08f, 0f);
+    spline = spline.addPoint(300, 0.45f, 0f);
 
     SPLINE = spline.build();
   }
@@ -40,14 +46,15 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
       return 0;
 
     Vec3 samplePos = Worley.getSamplePos(noise, pos);
-    List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).limit(4).toList();
+    List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).toList();
 
     Vec3 a = positions.get(0);
-    double d1 = edgeDist(samplePos, a, positions.get(1));
-    double d2 = edgeDist(samplePos, a, positions.get(2));
-    double d3 = edgeDist(samplePos, a, positions.get(3));
+    double riverDist = positions.stream().skip(1).map(i -> edgeDist(samplePos, a, i)).min(Double::compare).get();
 
-    double dist = Math.min(d1, Math.min(d2, d3));
+    //double landDist = positions.stream().skip(1).map(i -> samplePos.distanceTo(i)).limit(3).mapToDouble(Double::doubleValue).average().orElse(0);
+    double landDist = Math.abs(samplePos.distanceTo(a) - samplePos.distanceTo(a));
+
+    double dist = Mth.lerp(Math.clamp((riverDist - (SIZE + BANK)) / THRES, 0, 1), Math.min(riverDist, SIZE + BANK), Math.max(SIZE + BANK, landDist));
     return Math.copySign(SPLINE.apply((float) dist), a.y);
   }
 
