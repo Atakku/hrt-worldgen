@@ -12,7 +12,8 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
 
-public record Erosion(DensityFunction temperature, DensityFunction noise, DensityFunction ridge) implements DensityFunction.SimpleFunction {
+public record Erosion(DensityFunction temperature, DensityFunction noise, DensityFunction ridge)
+    implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Erosion> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("temperature").forGetter(Erosion::temperature),
@@ -20,8 +21,7 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("ridge").forGetter(Erosion::ridge))
           .apply(instance, Erosion::new)));
 
-  private static final CubicSpline<Float, ToFloatFunction<Float>> SPLINE;
-
+  private static final CubicSpline<Float, ToFloatFunction<Float>> MNT_SPLINE;
   static {
     float radius = 0.1f;
 
@@ -31,15 +31,24 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
       spline = spline.addPoint(peak, 0f, 0f);
       spline = spline.addPoint(peak + radius, 1.0f, 0f);
     }
-    SPLINE = spline.build();
+    MNT_SPLINE = spline.build();
+  }
+
+  private static final CubicSpline<Float, ToFloatFunction<Float>> RDG_SPLINE;
+  static {
+    CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
+    spline = spline.addPoint(0.08f, 0.5f, 0f);
+    spline = spline.addPoint(0.35f, 0.45f, 0f);
+    spline = spline.addPoint(0.4f, 0.325f, 0f);
+    RDG_SPLINE = spline.build();
   }
 
   public double compute(DensityFunction.FunctionContext pos) {
-    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
-    double mountain = SPLINE.apply((float) (temperature.compute(pos) + noise.compute(pos)));
-    double ridge = Mth.lerp(Math.abs(this.ridge.compute(pos)), 0.6, 0.2);
+    double mountain = MNT_SPLINE.apply((float) (temperature.compute(pos) + noise.compute(pos)));
+    double ridge = RDG_SPLINE.apply((float) Math.abs(this.ridge.compute(pos)));
 
     return Mth.lerp(mountain, 0, ridge);
   }
@@ -56,12 +65,12 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
 
   @Override
   public double minValue() {
-    return SPLINE.minValue();
+    return MNT_SPLINE.minValue();
   }
 
   @Override
   public double maxValue() {
-    return SPLINE.maxValue();
+    return MNT_SPLINE.maxValue();
   }
 
   @Override

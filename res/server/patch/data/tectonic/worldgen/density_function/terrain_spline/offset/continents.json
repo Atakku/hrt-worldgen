@@ -209,45 +209,6 @@
                   "value": 0.95
                 },
                 {
-                  "location": 0.175,
-                  "derivative": 0,
-                  "value": 0.55
-                },
-                {
-                  "location": 0.3,
-                  "derivative": 0,
-                  "value": 0.36
-                },
-                {
-                  "location": 0.375,
-                  "derivative": 0,
-                  "value": {
-                    "coordinate": "tectonic:noise/continent/ridges_folded",
-                    "points": [
-                      {
-                        "location": 0,
-                        "value": -0.1,
-                        "derivative": 0
-                      },
-                      {
-                        "location": 0.1,
-                        "value": 0.125,
-                        "derivative": 5
-                      },
-                      {
-                        "location": 0.1667,
-                        "value": 0.225,
-                        "derivative": 0
-                      },
-                      {
-                        "location": 0.3,
-                        "value": 0.3,
-                        "derivative": 0
-                      }
-                    ]
-                  }
-                },
-                {
                   "location": 0.425,
                   "derivative": 0,
                   "value": {
@@ -369,45 +330,6 @@
                   "location": 0,
                   "derivative": 0,
                   "value": 1.1
-                },
-                {
-                  "location": 0.175,
-                  "derivative": 0,
-                  "value": 0.65
-                },
-                {
-                  "location": 0.3,
-                  "derivative": 0,
-                  "value": 0.38
-                },
-                {
-                  "location": 0.375,
-                  "derivative": 0,
-                  "value": {
-                    "coordinate": "tectonic:noise/continent/ridges_folded",
-                    "points": [
-                      {
-                        "location": 0,
-                        "value": -0.1,
-                        "derivative": 0
-                      },
-                      {
-                        "location": 0.1,
-                        "value": 0.125,
-                        "derivative": 5
-                      },
-                      {
-                        "location": 0.1667,
-                        "value": 0.225,
-                        "derivative": 0
-                      },
-                      {
-                        "location": 0.3,
-                        "value": 0.33,
-                        "derivative": 0
-                      }
-                    ]
-                  }
                 },
                 {
                   "location": 0.425,

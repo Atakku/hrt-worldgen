@@ -34,12 +34,12 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     spline = spline.addPoint(-SIZE, -0.08f, 0f);
     spline = spline.addPoint(SIZE, 0.08f, 0f);
     spline = spline.addPoint(SIZE + BANK, 0.08f, 0f);
-    spline = spline.addPoint(SIZE + BANK * 3, 0.08f, 0f);
+    spline = spline.addPoint(Worley.D / 3, 0.35f, 0f);
 
     SPLINE = spline.build();
   }
 
-  public double compute(DensityFunction.FunctionContext pos) {
+  public double compute(FunctionContext pos) {
     if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
@@ -50,12 +50,10 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     double edgeDist = positions.stream().skip(1).map(i -> edgeDist(samplePos, a, i)).min(Double::compare).get();
     double riverDist = Math.max(0, edgeDist - SIZE);
     double landDist = samplePos.distanceTo(a);
-    // double landDist = samplePos.distanceTo(approximateCenter(positions));
 
     return Math.copySign(
-        Mth.lerp(smoothstep(0.65f, 0.7f, (riverDist / (riverDist + landDist))), SPLINE.apply((float) edgeDist), 0.41f),
+        Mth.lerp(smoothstep(0.6f, 0.7f, (riverDist / (riverDist + landDist))), SPLINE.apply((float) edgeDist), 0.4f),
         a.y);
-    // return Math.copySign(Mth.lerp(0, SPLINE.apply((float) edgeDist), 0.5f), a.y);
   }
 
   private static double smoothstep(double start, double end, double x) {
