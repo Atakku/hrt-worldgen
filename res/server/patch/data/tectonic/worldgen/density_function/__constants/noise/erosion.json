@@ -1,0 +1,6 @@
+{
+  "type": "hrt_worldgen:erosion",
+  "temperature": "hrt_worldgen:raw_temperature",
+  "noise": "hrt_worldgen:noise/erosion",
+  "ridge": "tectonic:__constants/noise/ridge"
+}

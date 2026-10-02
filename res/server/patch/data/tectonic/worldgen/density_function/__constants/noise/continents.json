@@ -1,9 +1,4 @@
 {
   "type": "hrt_worldgen:continents",
-  "noise": {
-    "type": "minecraft:noise",
-    "noise": "hrt_worldgen:continents",
-    "xz_scale": 1.0,
-    "y_scale": 1.0
-  }
+  "noise": "hrt_worldgen:noise/continents"
 }

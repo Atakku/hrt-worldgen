@@ -21,8 +21,8 @@ public final class Worley {
   public static final HashFunction MUR = Hashing.murmur3_32_fixed(0);
 
   public static final Vec3 getSamplePos(DensityFunction noise, FunctionContext pos) {
-    double nx = noise.compute(pos);
-    double nz = noise.compute(new SinglePointContext(pos.blockX(), pos.blockY() + 10000, pos.blockZ()));
+    double nx = noise.compute(new SinglePointContext(pos.blockX(), 0, pos.blockZ()));
+    double nz = noise.compute(new SinglePointContext(pos.blockX(), 10000, pos.blockZ()));
     return new Vec3(pos.blockX() + nx * D, 0, pos.blockZ() + nz * D);
   }
 

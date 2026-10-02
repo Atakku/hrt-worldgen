@@ -13,7 +13,7 @@ import zone.hrt.worldgen.Worldgen;
 public record Temperature(DensityFunction noise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Temperature> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.DIRECT_CODEC.fieldOf("noise").forGetter(Temperature::noise))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Temperature::noise))
           .apply(instance, Temperature::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {

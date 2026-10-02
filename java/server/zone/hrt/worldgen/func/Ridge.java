@@ -4,7 +4,6 @@
 
 package zone.hrt.worldgen.func;
 
-import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.util.CubicSpline;
@@ -12,7 +11,6 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
-import net.minecraft.world.level.levelgen.DensityFunctions.Spline;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
