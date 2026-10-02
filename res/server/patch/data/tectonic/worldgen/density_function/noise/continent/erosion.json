@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:flat_cache",
+  "argument": {
+    "type": "hrt_worldgen:erosion",
+    "temperature": "hrt_worldgen:raw_temperature",
+    "noise": {
+      "type": "minecraft:noise",
+      "noise": "hrt_worldgen:erosion",
+      "xz_scale": 1.0,
+      "y_scale": 1.0
+    },
+    "ridge": "tectonic:__constants/noise/ridge"
+  }
+}

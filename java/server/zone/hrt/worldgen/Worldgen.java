@@ -50,9 +50,7 @@ public class Worldgen {
 
   private void registerDensityFunctionTypes(final RegisterEvent event) {
     event.register(Registries.DENSITY_FUNCTION_TYPE, helper -> {
-      helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "edge_ratio"), EdgeRatio.CODEC_HOLDER.codec());
-      helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "land_ratio"), LandRatio.CODEC_HOLDER.codec());
-      helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "lerp"), Lerp.CODEC_HOLDER.codec());
+      helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "continents"), Continents.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "erosion"), Erosion.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "ridge"), Ridge.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "temperature"), Temperature.CODEC_HOLDER.codec());

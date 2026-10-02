@@ -1,45 +1,9 @@
 {
-  "type": "hrt_worldgen:lerp",
-  "delta": {
-    "type": "hrt_worldgen:edge_ratio",
-    "end": 13312.0,
-    "size": 1024.0
-  },
-  "start": {
-    "type": "minecraft:add",
-    "argument1": {
-      "type": "hrt_worldgen:lerp",
-      "delta": {
-        "type": "hrt_worldgen:edge_ratio",
-        "end": 12288.0,
-        "size": 4096.0
-      },
-      "start": {
-        "type": "hrt_worldgen:lerp",
-        "delta": {
-          "type": "hrt_worldgen:lerp",
-          "delta": {
-            "type": "hrt_worldgen:land_ratio",
-            "start": 8192
-          },
-          "start": -3,
-          "end": 1
-        },
-        "start": 2,
-        "end": 1
-      },
-      "end": 0
-    },
-    "argument2": {
-      "type": "minecraft:mul",
-      "argument1": 0.08,
-      "argument2": {
-        "type": "minecraft:noise",
-        "noise": "hrt_worldgen:fuzz",
-        "xz_scale": 1.0,
-        "y_scale": 1.0
-      }
-    }
-  },
-  "end": 0.25
+  "type": "hrt_worldgen:continents",
+  "noise": {
+    "type": "minecraft:noise",
+    "noise": "hrt_worldgen:continents",
+    "xz_scale": 1.0,
+    "y_scale": 1.0
+  }
 }

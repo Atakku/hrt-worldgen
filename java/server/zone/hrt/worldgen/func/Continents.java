@@ -5,21 +5,28 @@
 package zone.hrt.worldgen.func;
 
 import net.minecraft.util.KeyDispatchDataCodec;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.DensityFunction;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import zone.hrt.worldgen.Worldgen;
 
-public record EdgeRatio(DensityFunction size, DensityFunction end) implements DensityFunction.SimpleFunction {
-  public static final KeyDispatchDataCodec<EdgeRatio> CODEC_HOLDER = KeyDispatchDataCodec
+public record Continents(DensityFunction noise) implements DensityFunction.SimpleFunction {
+  public static final KeyDispatchDataCodec<Continents> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("size").forGetter(EdgeRatio::size),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("end").forGetter(EdgeRatio::end))
-          .apply(instance, EdgeRatio::new)));
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Continents::noise))
+          .apply(instance, Continents::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
-    double size = this.size.compute(pos);
-    double end = this.end.compute(pos);
+    if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+      return 0.25;
 
+    double noise = this.noise.compute(pos);
+    double world = Mth.lerp(Math.clamp(edgeRatio(pos, 4096, Worldgen.R_BLOCKS - 2048) + noise, 0, 1), 1.7, 0);
+    return Mth.lerp(edgeRatio(pos, 1536, Worldgen.R_BLOCKS - 256), world, 0.25);
+  }
+
+  private static final double edgeRatio(DensityFunction.FunctionContext pos, double size, double end) {
     double start = end - size;
     double edge = start - size;
 
@@ -48,17 +55,17 @@ public record EdgeRatio(DensityFunction size, DensityFunction end) implements De
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new EdgeRatio(size.mapAll(visitor), end.mapAll(visitor)));
+    return visitor.apply(new Continents(noise.mapAll(visitor)));
   }
 
   @Override
   public double minValue() {
-    return 0;
+    return -1.2;
   }
 
   @Override
   public double maxValue() {
-    return 1;
+    return 1.2;
   }
 
   @Override

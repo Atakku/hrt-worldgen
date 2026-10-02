@@ -4,6 +4,7 @@
 
 package zone.hrt.worldgen.func;
 
+import java.util.Comparator;
 import java.util.List;
 
 import net.minecraft.util.CubicSpline;
@@ -24,9 +25,8 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Ridge::noise))
           .apply(instance, Ridge::new)));
 
-  private static final int SIZE = 40;
-  private static final int BANK = 10;
-  private static final int THRES = 100;
+  private static final int SIZE = 30;
+  private static final int BANK = 5;
 
   private static final CubicSpline<Float, ToFloatFunction<Float>> SPLINE;
 
@@ -36,26 +36,32 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     spline = spline.addPoint(-SIZE, -0.08f, 0f);
     spline = spline.addPoint(SIZE, 0.08f, 0f);
     spline = spline.addPoint(SIZE + BANK, 0.08f, 0f);
-    spline = spline.addPoint(300, 0.45f, 0f);
+    spline = spline.addPoint(SIZE + BANK * 3, 0.08f, 0f);
 
     SPLINE = spline.build();
   }
 
   public double compute(DensityFunction.FunctionContext pos) {
-    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
     Vec3 samplePos = Worley.getSamplePos(noise, pos);
     List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).toList();
 
     Vec3 a = positions.get(0);
-    double riverDist = positions.stream().skip(1).map(i -> edgeDist(samplePos, a, i)).min(Double::compare).get();
+    double edgeDist = positions.stream().skip(1).map(i -> edgeDist(samplePos, a, i)).min(Double::compare).get();
+    double riverDist = Math.max(0, edgeDist - SIZE);
+    double landDist = samplePos.distanceTo(a);
+    // double landDist = samplePos.distanceTo(approximateCenter(positions));
 
-    //double landDist = positions.stream().skip(1).map(i -> samplePos.distanceTo(i)).limit(3).mapToDouble(Double::doubleValue).average().orElse(0);
-    double landDist = Math.abs(samplePos.distanceTo(a) - samplePos.distanceTo(a));
+    return Math.copySign(
+        Mth.lerp(smoothstep(0.65f, 0.7f, (riverDist / (riverDist + landDist))), SPLINE.apply((float) edgeDist), 0.41f),
+        a.y);
+    // return Math.copySign(Mth.lerp(0, SPLINE.apply((float) edgeDist), 0.5f), a.y);
+  }
 
-    double dist = Mth.lerp(Math.clamp((riverDist - (SIZE + BANK)) / THRES, 0, 1), Math.min(riverDist, SIZE + BANK), Math.max(SIZE + BANK, landDist));
-    return Math.copySign(SPLINE.apply((float) dist), a.y);
+  private static double smoothstep(double start, double end, double x) {
+    return Math.clamp((x - start) / (end - start), 0.0, 1.0);
   }
 
   private static final double edgeDist(Vec3 pos, Vec3 a, Vec3 b) {
