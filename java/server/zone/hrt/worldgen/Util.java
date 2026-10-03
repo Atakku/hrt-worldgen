@@ -67,14 +67,18 @@ public final class Util {
   }
 
   public static final Vec3 getPoint(int cx, int cz) {
-    double x = sample(cx, cz) * Worldgen.CELL_SIZE;
-    double z = sample(cz, cx) * Worldgen.CELL_SIZE;
+    double x = ((sample(cx, cz) - 0.5f) * 0.9f + cx) * Worldgen.CELL_SIZE;
+    double z = ((sample(cz, cx) - 0.5f) * 0.9f + cz) * Worldgen.CELL_SIZE;
     return new Vec3(x, Math.abs(cx + cz) % 2 - 0.5, z);
   }
 
-  public static final float sample(int input, int seed) {
-    long random = Integer.toUnsignedLong(MUR.hashInt(input + seed * 12345).asInt());
-    return ((((float) random) / (1L << 32) - 0.5f) * 0.9f + input);
+  public static final float sample(double a, double b) {
+    return sample((int) a, (int) b);
+  }
+
+  public static final float sample(int a, int b) {
+    long random = Integer.toUnsignedLong(MUR.hashInt(a + b * 12345).asInt());
+    return ((float) random) / (1L << 32);
   }
 
   public static final boolean isOutside(ChunkPos p, int b) {

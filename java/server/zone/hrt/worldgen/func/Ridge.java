@@ -16,11 +16,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
 import zone.hrt.worldgen.Util;
 
-public record Ridge(DensityFunction edgeNoise, DensityFunction plateauNoise) implements DensityFunction.SimpleFunction {
+public record Ridge(DensityFunction edgeNoise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Ridge> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("edge_noise").forGetter(Ridge::edgeNoise),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("plateau_noise").forGetter(Ridge::plateauNoise))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("edge_noise").forGetter(Ridge::edgeNoise))
           .apply(instance, Ridge::new)));
 
 
@@ -56,7 +55,7 @@ public record Ridge(DensityFunction edgeNoise, DensityFunction plateauNoise) imp
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Ridge(edgeNoise.mapAll(visitor), plateauNoise.mapAll(visitor)));
+    return visitor.apply(new Ridge(edgeNoise.mapAll(visitor)));
   }
 
   @Override

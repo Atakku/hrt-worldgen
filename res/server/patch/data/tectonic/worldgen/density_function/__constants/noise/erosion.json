@@ -2,6 +2,5 @@
   "type": "hrt_worldgen:erosion",
   "temperature": "hrt_worldgen:raw_temperature",
   "edge_noise": "hrt_worldgen:noise/edge",
-  "mountain_noise": "hrt_worldgen:noise/mountain",
-  "plateau_noise": "hrt_worldgen:noise/plateau"
+  "mountain_noise": "hrt_worldgen:noise/mountain"
 }

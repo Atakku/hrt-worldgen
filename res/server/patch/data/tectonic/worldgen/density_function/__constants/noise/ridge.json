@@ -1,5 +1,4 @@
 {
   "type": "hrt_worldgen:ridge",
-  "edge_noise": "hrt_worldgen:noise/edge",
-  "plateau_noise": "hrt_worldgen:noise/plateau"
+  "edge_noise": "hrt_worldgen:noise/edge"
 }

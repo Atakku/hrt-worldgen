@@ -17,14 +17,13 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
 import zone.hrt.worldgen.Util;
 
-public record Erosion(DensityFunction temperature, DensityFunction edgeNoise, DensityFunction mountainNoise, DensityFunction plateauNoise)
+public record Erosion(DensityFunction temperature, DensityFunction edgeNoise, DensityFunction mountainNoise)
     implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Erosion> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("temperature").forGetter(Erosion::temperature),
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("edge_noise").forGetter(Erosion::edgeNoise),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("mountain_noise").forGetter(Erosion::mountainNoise),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("plateau_noise").forGetter(Erosion::plateauNoise))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("mountain_noise").forGetter(Erosion::mountainNoise))
           .apply(instance, Erosion::new)));
 
   private static final CubicSpline<Float, ToFloatFunction<Float>> MNT_SPLINE;
@@ -49,14 +48,14 @@ public record Erosion(DensityFunction temperature, DensityFunction edgeNoise, De
     Vec3 a = positions.get(0);
 
     double mountain = MNT_SPLINE.apply((float) (temperature.compute(pos) + mountainNoise.compute(pos)));
-    double plateau = Math.abs(plateauNoise.compute(new SinglePointContext((int)a.x, 0, (int)a.z)));
+    double plateau = Util.sample(a.x, a.z) * 0.1;
 
     double edgeDist = Util.minEdge(samplePos, positions);
     double riverDist = Math.max(0, edgeDist - Worldgen.RIVER);
     double landDist = samplePos.distanceTo(a);
 
     double endTresh = (riverDist + landDist) * 0.7;
-    double startTresh = endTresh - 20 - plateau * 2000;
+    double startTresh = Math.max(0, endTresh - 20 - plateau * 2000);
 
     double delta = Math.clamp((riverDist - startTresh) / (endTresh - startTresh), 0, 1);
     return Math.min(mountain, Mth.lerp(delta, 0.5, 0.325 - plateau));
@@ -69,7 +68,7 @@ public record Erosion(DensityFunction temperature, DensityFunction edgeNoise, De
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Erosion(temperature.mapAll(visitor), edgeNoise.mapAll(visitor), mountainNoise.mapAll(visitor), plateauNoise.mapAll(visitor)));
+    return visitor.apply(new Erosion(temperature.mapAll(visitor), edgeNoise.mapAll(visitor), mountainNoise.mapAll(visitor)));
   }
 
   @Override
