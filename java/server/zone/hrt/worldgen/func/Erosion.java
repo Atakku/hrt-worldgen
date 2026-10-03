@@ -37,9 +37,9 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
   private static final CubicSpline<Float, ToFloatFunction<Float>> RDG_SPLINE;
   static {
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
-    spline = spline.addPoint(0.08f, 0.5f, 0f);
-    spline = spline.addPoint(0.35f, 0.45f, 0f);
-    spline = spline.addPoint(0.4f, 0.325f, 0f);
+    spline = spline.addPoint(0.07f, 0.5f, 0f); // could be 0.8?
+    spline = spline.addPoint(0.10f, 0.5f, 0f);
+    spline = spline.addPoint(0.12f, 0.325f, 0f);
     RDG_SPLINE = spline.build();
   }
 

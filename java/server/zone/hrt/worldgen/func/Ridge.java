@@ -31,10 +31,10 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
   static {
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
 
-    spline = spline.addPoint(-SIZE, -0.08f, 0f);
-    spline = spline.addPoint(SIZE, 0.08f, 0f);
-    spline = spline.addPoint(SIZE + BANK, 0.08f, 0f);
-    spline = spline.addPoint(Worley.D / 3, 0.35f, 0f);
+    spline = spline.addPoint(-SIZE, -0.078f, 0f);
+    spline = spline.addPoint(SIZE, 0.078f, 0f);
+    spline = spline.addPoint(SIZE + BANK, 0.078f, 0f);
+    spline = spline.addPoint(Worley.D / 3, 0.10f, 0f);
 
     SPLINE = spline.build();
   }
@@ -52,7 +52,7 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
     double landDist = samplePos.distanceTo(a);
 
     return Math.copySign(
-        Mth.lerp(smoothstep(0.6f, 0.7f, (riverDist / (riverDist + landDist))), SPLINE.apply((float) edgeDist), 0.4f),
+        Mth.lerp(smoothstep(0.6f, 0.7f, (riverDist / (riverDist + landDist))), SPLINE.apply((float) edgeDist), 0.12f),
         a.y);
   }
 

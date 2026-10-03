@@ -18,15 +18,12 @@ public record Vegetation(DensityFunction temperature, DensityFunction noise) imp
           .apply(instance, Vegetation::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
-    int x = pos.blockX();
-    int z = pos.blockZ();
-
     if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
     double temp = this.temperature.compute(pos);
     double noise = this.noise.compute(pos);
-    double raw = (x * 1.5 - z * 0.5) / (2d * Worldgen.CR_BLOCKS);
+    double raw = (pos.blockX() * 1.5 - pos.blockZ() * 0.5) / (2d * Worldgen.CR_BLOCKS);
 
     return Mth.clamp(Mth.lerp(temp * temp, raw / 1.75, raw) + noise, -1, 1);
   }

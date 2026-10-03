@@ -17,14 +17,11 @@ public record Temperature(DensityFunction noise) implements DensityFunction.Simp
           .apply(instance, Temperature::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
-    int x = pos.blockX();
-    int z = pos.blockZ();
-
     if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
     double noise = this.noise.compute(pos);
-    double raw = (x * 0.5 + z * 1.5) / (2d * Worldgen.CR_BLOCKS);
+    double raw = (pos.blockX() * 0.5 + pos.blockZ() * 1.5) / (2d * Worldgen.CR_BLOCKS);
 
     return Mth.clamp(raw + noise, -1, 1);
   }
