@@ -6,7 +6,6 @@ package zone.hrt.worldgen.func;
 
 import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
-import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -27,9 +26,9 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
 
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
     for (float peak : new float[] { -0.45f, 0.55f }) {
-      spline = spline.addPoint(peak - radius, 1.0f, 0f);
+      spline = spline.addPoint(peak - radius, 0.5f, 0f);
       spline = spline.addPoint(peak, 0f, 0f);
-      spline = spline.addPoint(peak + radius, 1.0f, 0f);
+      spline = spline.addPoint(peak + radius, 0.5f, 0f);
     }
     MNT_SPLINE = spline.build();
   }
@@ -50,7 +49,7 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
     double mountain = MNT_SPLINE.apply((float) (temperature.compute(pos) + noise.compute(pos)));
     double ridge = RDG_SPLINE.apply((float) Math.abs(this.ridge.compute(pos)));
 
-    return Mth.lerp(mountain, 0, ridge);
+    return Math.min(mountain, ridge);
   }
 
   @Override
