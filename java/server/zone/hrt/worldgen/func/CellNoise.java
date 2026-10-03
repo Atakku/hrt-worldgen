@@ -10,22 +10,22 @@ import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
-import zone.hrt.worldgen.Worley;
+import zone.hrt.worldgen.Util;
 
-public record Voronoi(DensityFunction argument, DensityFunction noise) implements DensityFunction.SimpleFunction {
-  public static final KeyDispatchDataCodec<Voronoi> CODEC_HOLDER = KeyDispatchDataCodec
+public record CellNoise(DensityFunction argument, DensityFunction noise) implements DensityFunction.SimpleFunction {
+  public static final KeyDispatchDataCodec<CellNoise> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("argument").forGetter(Voronoi::argument),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Voronoi::noise))
-          .apply(instance, Voronoi::new)));
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("argument").forGetter(CellNoise::argument),
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("edge_noise").forGetter(CellNoise::noise))
+          .apply(instance, CellNoise::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
-    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if(Util.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
-    Vec3 samplePos = Worley.getSamplePos(noise, pos);
-    Vec3 rp = Worley.getNearestPoints(pos, samplePos).findFirst().get();
-    return argument.compute(new SinglePointContext((int)rp.x, 0, (int)rp.z));
+    Vec3 samplePos = Util.getSamplePos(noise, pos);
+    Vec3 a = Util.getNearestPoints(pos, samplePos).findFirst().get();
+    return argument.compute(new SinglePointContext((int)a.x, 0, (int)a.z));
   }
 
   @Override
@@ -35,7 +35,7 @@ public record Voronoi(DensityFunction argument, DensityFunction noise) implement
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Voronoi(argument.mapAll(visitor), noise.mapAll(visitor)));
+    return visitor.apply(new CellNoise(argument.mapAll(visitor), noise.mapAll(visitor)));
   }
 
   @Override

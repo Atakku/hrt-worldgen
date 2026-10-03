@@ -10,12 +10,13 @@
     "minecraft:bamboo_jungle",
     "minecraft:savanna",
     "minecraft:desert",
-    "minecraft:forest"
+    "minecraft:forest",
+    "minecraft:stony_peaks"
   ],
   "replacement": "minecraft:badlands",
   "parameters": {
     "humidity": [-1.0, 1.0],
-    "temperature": [0.0, 1.0],
+    "temperature": [0.4, 1.0],
     "erosion": [-1.0, -0.045]
   }
 }

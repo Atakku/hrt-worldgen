@@ -4,20 +4,27 @@
 
 package zone.hrt.worldgen.func;
 
+import java.util.List;
+
 import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
+import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
+import net.minecraft.world.phys.Vec3;
+
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
+import zone.hrt.worldgen.Util;
 
-public record Erosion(DensityFunction temperature, DensityFunction noise, DensityFunction ridge)
+public record Erosion(DensityFunction temperature, DensityFunction edgeNoise, DensityFunction mountainNoise, DensityFunction plateauNoise)
     implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Erosion> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
           DensityFunction.HOLDER_HELPER_CODEC.fieldOf("temperature").forGetter(Erosion::temperature),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Erosion::noise),
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("ridge").forGetter(Erosion::ridge))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("edge_noise").forGetter(Erosion::edgeNoise),
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("mountain_noise").forGetter(Erosion::mountainNoise),
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("plateau_noise").forGetter(Erosion::plateauNoise))
           .apply(instance, Erosion::new)));
 
   private static final CubicSpline<Float, ToFloatFunction<Float>> MNT_SPLINE;
@@ -33,23 +40,23 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
     MNT_SPLINE = spline.build();
   }
 
-  private static final CubicSpline<Float, ToFloatFunction<Float>> RDG_SPLINE;
-  static {
-    CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
-    spline = spline.addPoint(0.07f, 0.5f, 0f); // could be 0.8?
-    spline = spline.addPoint(0.10f, 0.5f, 0f);
-    spline = spline.addPoint(0.12f, 0.325f, 0f);
-    RDG_SPLINE = spline.build();
-  }
-
   public double compute(DensityFunction.FunctionContext pos) {
-    if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if (Util.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
-    double mountain = MNT_SPLINE.apply((float) (temperature.compute(pos) + noise.compute(pos)));
-    double ridge = RDG_SPLINE.apply((float) Math.abs(this.ridge.compute(pos)));
+    Vec3 samplePos = Util.getSamplePos(edgeNoise, pos);
+    List<Vec3> positions = Util.getNearestPoints(pos, samplePos).toList();
+    Vec3 a = positions.get(0);
 
-    return Math.min(mountain, ridge);
+    double mountain = MNT_SPLINE.apply((float) (temperature.compute(pos) + mountainNoise.compute(pos)));
+    double plateau = Math.abs(plateauNoise.compute(new SinglePointContext((int)a.x, 0, (int)a.z)));
+
+    double edgeDist = Util.minEdge(samplePos, positions);
+    double riverDist = Math.max(0, edgeDist - Worldgen.RIVER);
+    double landDist = samplePos.distanceTo(a);
+
+    double delta = Util.smoothstep(0.6f - plateau * 2, 0.7f, (riverDist / (riverDist + landDist)));
+    return Math.min(mountain, Mth.lerp(delta, 0.5, 0.325 - plateau));
   }
 
   @Override
@@ -59,7 +66,7 @@ public record Erosion(DensityFunction temperature, DensityFunction noise, Densit
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Erosion(temperature.mapAll(visitor), noise.mapAll(visitor), ridge.mapAll(visitor)));
+    return visitor.apply(new Erosion(temperature.mapAll(visitor), edgeNoise.mapAll(visitor), mountainNoise.mapAll(visitor), plateauNoise.mapAll(visitor)));
   }
 
   @Override

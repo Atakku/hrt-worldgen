@@ -1,4 +1,4 @@
 {
   "type": "hrt_worldgen:continents",
-  "noise": "hrt_worldgen:noise/continents"
+  "continents_noise": "hrt_worldgen:noise/continents"
 }

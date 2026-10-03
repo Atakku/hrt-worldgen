@@ -1,0 +1,5 @@
+{
+  "type": "hrt_worldgen:cell_noise",
+  "argument": "hrt_worldgen:raw_vegetation",
+  "edge_noise": "hrt_worldgen:noise/edge"
+}

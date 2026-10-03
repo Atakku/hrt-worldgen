@@ -9,20 +9,22 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.DensityFunction;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import zone.hrt.worldgen.Util;
 import zone.hrt.worldgen.Worldgen;
 
 public record Continents(DensityFunction noise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Continents> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Continents::noise))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("continents_noise").forGetter(Continents::noise))
           .apply(instance, Continents::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
-    if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if (Util.isOutside(pos, Worldgen.R_BLOCKS))
       return 0.25;
 
     double noise = this.noise.compute(pos);
-    double world = Mth.lerp(Math.clamp(edgeRatio(pos, 4096, Worldgen.R_BLOCKS - 2048) + noise, 0, 1), 1.7, 0);
+    double worldDelta = edgeRatio(pos, 4096, Worldgen.CR_BLOCKS + 2048) + noise;
+    double world = Mth.lerp(Math.clamp(worldDelta, 0, 1), 1.7, 0);
     return Mth.lerp(edgeRatio(pos, 1536, Worldgen.R_BLOCKS - 256), world, 0.25);
   }
 

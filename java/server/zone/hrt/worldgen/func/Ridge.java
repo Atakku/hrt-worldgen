@@ -8,66 +8,45 @@ import java.util.List;
 
 import net.minecraft.util.CubicSpline;
 import net.minecraft.util.KeyDispatchDataCodec;
-import net.minecraft.util.Mth;
 import net.minecraft.util.ToFloatFunction;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import zone.hrt.worldgen.Worldgen;
-import zone.hrt.worldgen.Worley;
+import zone.hrt.worldgen.Util;
 
-public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunction {
+public record Ridge(DensityFunction edgeNoise, DensityFunction plateauNoise) implements DensityFunction.SimpleFunction {
   public static final KeyDispatchDataCodec<Ridge> CODEC_HOLDER = KeyDispatchDataCodec
       .of(RecordCodecBuilder.mapCodec(instance -> instance.group(
-          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("noise").forGetter(Ridge::noise))
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("edge_noise").forGetter(Ridge::edgeNoise),
+          DensityFunction.HOLDER_HELPER_CODEC.fieldOf("plateau_noise").forGetter(Ridge::plateauNoise))
           .apply(instance, Ridge::new)));
 
-  private static final int SIZE = 30;
-  private static final int BANK = 5;
 
   private static final CubicSpline<Float, ToFloatFunction<Float>> SPLINE;
 
   static {
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
 
-    spline = spline.addPoint(-SIZE, -0.078f, 0f);
-    spline = spline.addPoint(SIZE, 0.078f, 0f);
-    spline = spline.addPoint(SIZE + BANK, 0.078f, 0f);
-    spline = spline.addPoint(Worley.D / 3, 0.10f, 0f);
+    spline = spline.addPoint(-Worldgen.RIVER, -0.078f, 0f);
+    spline = spline.addPoint(Worldgen.RIVER, 0.078f, 0f);
+    spline = spline.addPoint(Worldgen.RIVER + Worldgen.BANK, 0.078f, 0f);
+    spline = spline.addPoint((float) (Worldgen.CELL_SIZE / 3), 0.11f, 0f);
 
     SPLINE = spline.build();
   }
 
   public double compute(FunctionContext pos) {
-    if (Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if (Util.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
-    Vec3 samplePos = Worley.getSamplePos(noise, pos);
-    List<Vec3> positions = Worley.getNearestPoints(pos, samplePos).toList();
+    Vec3 samplePos = Util.getSamplePos(edgeNoise, pos);
+    List<Vec3> positions = Util.getNearestPoints(pos, samplePos).toList();
 
     Vec3 a = positions.get(0);
-    double edgeDist = positions.stream().skip(1).map(i -> edgeDist(samplePos, a, i)).min(Double::compare).get();
-    double riverDist = Math.max(0, edgeDist - SIZE);
-    double landDist = samplePos.distanceTo(a);
-
-    return Math.copySign(
-        Mth.lerp(smoothstep(0.6f, 0.7f, (riverDist / (riverDist + landDist))), SPLINE.apply((float) edgeDist), 0.12f),
-        a.y);
-  }
-
-  private static double smoothstep(double start, double end, double x) {
-    return Math.clamp((x - start) / (end - start), 0.0, 1.0);
-  }
-
-  private static final double edgeDist(Vec3 pos, Vec3 a, Vec3 b) {
-    Vec3 c = a.add(b).scale(0.5);
-
-    double da = a.z - b.z;
-    double db = b.x - a.x;
-    double dc = da * c.z - db * c.x;
-
-    return Math.abs(db * pos.x - da * pos.z + dc) / Math.sqrt(da * da + db * db);
+    double edgeDist = Util.minEdge(samplePos, positions);
+    return Math.copySign(SPLINE.apply((float) edgeDist), a.y);
   }
 
   @Override
@@ -77,7 +56,7 @@ public record Ridge(DensityFunction noise) implements DensityFunction.SimpleFunc
 
   @Override
   public DensityFunction mapAll(Visitor visitor) {
-    return visitor.apply(new Ridge(noise.mapAll(visitor)));
+    return visitor.apply(new Ridge(edgeNoise.mapAll(visitor), plateauNoise.mapAll(visitor)));
   }
 
   @Override

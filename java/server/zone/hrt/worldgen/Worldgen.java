@@ -43,6 +43,11 @@ public class Worldgen {
   public static final int R_CHUNKS_SOFT = R_CHUNKS - 4;
   public static final int R_BLOCKS = R_CHUNKS * 16;
 
+  // Cell width & borders
+  public static final double CELL_SIZE = 1024;
+  public static final int RIVER = 30;
+  public static final int BANK = 5;
+
   public Worldgen(IEventBus bus) {
     bus.addListener(this::registerDensityFunctionTypes);
     bus.addListener(this::registerEnabledPacks);
@@ -50,12 +55,12 @@ public class Worldgen {
 
   private void registerDensityFunctionTypes(final RegisterEvent event) {
     event.register(Registries.DENSITY_FUNCTION_TYPE, helper -> {
+      helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "cell_noise"), CellNoise.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "continents"), Continents.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "erosion"), Erosion.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "ridge"), Ridge.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "temperature"), Temperature.CODEC_HOLDER.codec());
       helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "vegetation"), Vegetation.CODEC_HOLDER.codec());
-      helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "voronoi"), Voronoi.CODEC_HOLDER.codec());
     });
   }
 
@@ -79,17 +84,5 @@ public class Worldgen {
               false));
       event.addRepositorySource((packConsumer) -> packConsumer.accept(dataPack));
     }
-  }
-
-  public static boolean isOutside(ChunkPos p, int b) {
-    return isOutside(p.x, p.z, b);
-  }
-
-  public static boolean isOutside(DensityFunction.FunctionContext p, int b) {
-    return isOutside(p.blockX(), p.blockZ(), b);
-  }
-
-  public static boolean isOutside(int x, int z, int b) {
-    return x >= b || z >= b || x < -b || z < -b;
   }
 }

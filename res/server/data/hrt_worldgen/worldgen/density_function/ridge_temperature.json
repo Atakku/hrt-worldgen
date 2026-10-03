@@ -1,5 +1,0 @@
-{
-  "type": "hrt_worldgen:voronoi",
-  "argument": "hrt_worldgen:raw_temperature",
-  "noise": "hrt_worldgen:noise/ridge"
-}

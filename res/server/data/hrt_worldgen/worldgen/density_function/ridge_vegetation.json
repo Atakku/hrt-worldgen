@@ -1,5 +1,0 @@
-{
-  "type": "hrt_worldgen:voronoi",
-  "argument": "hrt_worldgen:raw_vegetation",
-  "noise": "hrt_worldgen:noise/ridge"
-}

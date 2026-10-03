@@ -8,6 +8,7 @@ import net.minecraft.util.KeyDispatchDataCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.DensityFunction;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import zone.hrt.worldgen.Util;
 import zone.hrt.worldgen.Worldgen;
 
 public record Temperature(DensityFunction noise) implements DensityFunction.SimpleFunction {
@@ -17,7 +18,7 @@ public record Temperature(DensityFunction noise) implements DensityFunction.Simp
           .apply(instance, Temperature::new)));
 
   public double compute(DensityFunction.FunctionContext pos) {
-    if(Worldgen.isOutside(pos, Worldgen.R_BLOCKS))
+    if(Util.isOutside(pos, Worldgen.R_BLOCKS))
       return 0;
 
     double noise = this.noise.compute(pos);
