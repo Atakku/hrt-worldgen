@@ -55,7 +55,10 @@ public record Erosion(DensityFunction temperature, DensityFunction edgeNoise, De
     double riverDist = Math.max(0, edgeDist - Worldgen.RIVER);
     double landDist = samplePos.distanceTo(a);
 
-    double delta = Util.smoothstep(0.6f - plateau * 2, 0.7f, (riverDist / (riverDist + landDist)));
+    double endTresh = (riverDist + landDist) * 0.7;
+    double startTresh = endTresh - 20 - plateau * 2000;
+
+    double delta = Math.clamp((riverDist - startTresh) / (endTresh - startTresh), 0, 1);
     return Math.min(mountain, Mth.lerp(delta, 0.5, 0.325 - plateau));
   }
 

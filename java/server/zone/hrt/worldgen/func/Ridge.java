@@ -29,9 +29,9 @@ public record Ridge(DensityFunction edgeNoise, DensityFunction plateauNoise) imp
   static {
     CubicSpline.Builder<Float, ToFloatFunction<Float>> spline = CubicSpline.builder(ToFloatFunction.IDENTITY);
 
-    spline = spline.addPoint(-Worldgen.RIVER, -0.078f, 0f);
-    spline = spline.addPoint(Worldgen.RIVER, 0.078f, 0f);
-    spline = spline.addPoint(Worldgen.RIVER + Worldgen.BANK, 0.078f, 0f);
+    spline = spline.addPoint(-Worldgen.RIVER, -0.08f, 0f);
+    spline = spline.addPoint(Worldgen.RIVER, 0.08f, 0f);
+    spline = spline.addPoint(Worldgen.RIVER + Worldgen.BANK, 0.08f, 0f);
     spline = spline.addPoint((float) (Worldgen.CELL_SIZE / 3), 0.11f, 0f);
 
     SPLINE = spline.build();
